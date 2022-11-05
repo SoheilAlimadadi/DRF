@@ -1,6 +1,10 @@
+import pkg_resources
 from api.serializers import ProductSerializer
 from rest_framework import generics
 from .models import Product
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
@@ -17,3 +21,43 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
             content = title
         serializer.save(content=content)
         print(serializer.data)
+
+class ProductUpdateAPIView(generics.UpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+    
+    def perform_update(self, serializer):
+        instance = serializer.save()
+    
+class ProductDestroyAPIView(generics.DestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+    
+    def perform_destroy(self, instance):
+        return super().perform_destroy(instance)
+    
+    
+
+@api_view(['GET' , 'POST'])
+def product_alt_view(request, pk=None, *args, **kwargs):
+    if request.method == 'GET':
+        if pk is not None:
+            obj = get_object_or_404(Product, pk=pk)
+            data = ProductSerializer(obj).data
+            return Response(data)
+        queryset = Product.objects.all()
+        data = ProductSerializer(queryset, many=True).data
+        return Response(data)
+    
+    if request.method == 'POST':
+        serializer = ProductSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            title = serializer.validated_data.get('title')
+            content = serializer.validated_data.get('content') or None
+            if content is None:
+                content = title
+            serializer.save(content=content)
+            return Response(serializer.data)
+
