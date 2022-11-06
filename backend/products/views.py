@@ -1,4 +1,3 @@
-import pkg_resources
 from api.serializers import ProductSerializer
 from rest_framework import generics, permissions, authentication
 from .models import Product
@@ -6,7 +5,6 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from .permissions import IsStaffPermissions
-from api.authentication import TokenAuthentication
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
