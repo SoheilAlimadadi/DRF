@@ -1,18 +1,22 @@
 import pkg_resources
 from api.serializers import ProductSerializer
-from rest_framework import generics
+from rest_framework import generics, permissions, authentication
 from .models import Product
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from .permissions import IsStaffPermissions
+from api.authentication import TokenAuthentication
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAdminUser, IsStaffPermissions]
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAdminUser, IsStaffPermissions]
     
     def perform_create(self, serializer):
         title = serializer.validated_data.get('title')
@@ -26,14 +30,16 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
+    permission_classes = [permissions.IsAdminUser, IsStaffPermissions]
     
     def perform_update(self, serializer):
-        instance = serializer.save()
+        return super().perform_update(serializer)
     
 class ProductDestroyAPIView(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
+    permission_classes = [permissions.IsAdminUser, IsStaffPermissions]
     
     def perform_destroy(self, instance):
         return super().perform_destroy(instance)
