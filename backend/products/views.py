@@ -9,7 +9,7 @@ from .permissions import IsStaffPermissions
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAdminUser, IsStaffPermissions]
+    permission_classes = [permissions.IsAdminUser, IsStaffPermissions] 
 
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
